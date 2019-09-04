@@ -1,0 +1,10 @@
+using System;
+using System.Collections.Concurrent;
+
+namespace WebSocketServer
+{
+    interface IApplication
+    {
+        void HandleMessage(ConcurrentDictionary<String, Connection> connections, Message message);
+    }
+}
