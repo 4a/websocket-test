@@ -200,6 +200,10 @@ namespace WebSocketServer
                 App = Chat.Instance;
                 Chat.FetchLogs(this, 0, 50);
             }
+            else
+            {
+                Disconnect();
+            }
         }
 
         private void HandleFrame(Frame frame)
