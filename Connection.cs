@@ -94,7 +94,7 @@ namespace WebSocketServer
         private void WritePong()
         {
             byte opcodeByte = Convert.ToByte("10001010", 2); // FIN (Bit 0) | Opcode (Bit 4:7) | 1010: "pong"
-            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0 });
+            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0, 0 });
             Console.WriteLine($"Received `PING` from the client at key: {Key}");
             if (sent)
             {
@@ -107,7 +107,7 @@ namespace WebSocketServer
             Console.WriteLine($"Attempting to send `CLOSE` to the client at key: {Key}");
 
             byte opcodeByte = Convert.ToByte("10001000", 2); // FIN (Bit 0) | Opcode (Bit 4:7) | 1000: "close"
-            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0 });
+            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0, 0 });
             if (sent)
             {
                 Disconnect();
