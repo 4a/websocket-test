@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using DotNetEnv;
 
+using WebSocketServer.Applications;
 namespace WebSocketServer
 {
     class Connection
@@ -197,7 +198,7 @@ namespace WebSocketServer
             if (origin == AppURI["chat"])
             {
                 App = Chat.Instance;
-                Chat.DisplayHistory(this);
+                Chat.FetchLogs(this, 0, 50);
             }
         }
 

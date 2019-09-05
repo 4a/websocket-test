@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 
+using WebSocketServer.Applications;
 namespace WebSocketServer
 {
     class Server // TODO: implement IObservable?
