@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
 using WebSocketServer.Applications;
 namespace WebSocketServer
@@ -27,12 +29,14 @@ namespace WebSocketServer
             listener.Start();
             Console.WriteLine($"Server has started on {_ip}:{_port}.");
             Console.WriteLine("Waiting for a connection...", Environment.NewLine);
+            StartHeartBeat();
             while (IsActive)
             {
                 Connection connection = new Connection(this, listener.AcceptTcpClient()); // blocks until a client connects
                 connection.StreamInput(); // loops on a new thread
                 AddConnection(connection);
             }
+
         }
 
         public void Stop()
@@ -76,6 +80,22 @@ namespace WebSocketServer
         public void HandleMessage(IApplication app, Message message)
         {
             app.HandleMessage(Connections, message);
+        }
+
+        private void StartHeartBeat()
+        {
+            Task task = Task.Run(() =>
+            {
+                while (IsActive)
+                {
+                    Thread.Sleep(10000);
+                    foreach (KeyValuePair<string, Connection> item in Connections) // TODO: is this threadsafe?
+                    {
+                        Connection connection = item.Value;
+                        connection.WritePing();
+                    }
+                }
+            });
         }
     }
 }

@@ -80,10 +80,10 @@ namespace WebSocketServer
             }
         }
 
-        private void WritePing()
+        public void WritePing()
         {
             byte opcodeByte = Convert.ToByte("10001001", 2); // FIN (Bit 0) | Opcode (Bit 4:7) | 1001: "ping"
-            bool sent = TryWriteToStream(new byte[] { opcodeByte });
+            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0, 0 });
             if (sent)
             {
                 Console.WriteLine($"Successfully sent `PING` to the client at key: {Key}");
@@ -94,7 +94,7 @@ namespace WebSocketServer
         private void WritePong()
         {
             byte opcodeByte = Convert.ToByte("10001010", 2); // FIN (Bit 0) | Opcode (Bit 4:7) | 1010: "pong"
-            bool sent = TryWriteToStream(new byte[] { opcodeByte });
+            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0 });
             Console.WriteLine($"Received `PING` from the client at key: {Key}");
             if (sent)
             {
@@ -107,7 +107,7 @@ namespace WebSocketServer
             Console.WriteLine($"Attempting to send `CLOSE` to the client at key: {Key}");
 
             byte opcodeByte = Convert.ToByte("10001000", 2); // FIN (Bit 0) | Opcode (Bit 4:7) | 1000: "close"
-            bool sent = TryWriteToStream(new byte[] { opcodeByte });
+            bool sent = TryWriteToStream(new byte[] { opcodeByte, 0, 0 });
             if (sent)
             {
                 Disconnect();
@@ -172,6 +172,7 @@ namespace WebSocketServer
             }
             else
             {
+                Console.WriteLine("Handshake failed, disconnecting...");
                 Disconnect();
             }
         }
@@ -202,6 +203,7 @@ namespace WebSocketServer
             }
             else
             {
+                Console.WriteLine("Unknown application, disconnecting...");
                 Disconnect();
             }
         }
@@ -216,6 +218,9 @@ namespace WebSocketServer
                     break;
                 case "ping":
                     WritePong();
+                    break;
+                case "pong":
+                    HandlePong();
                     break;
                 default:
                     WriteClose();
@@ -240,6 +245,11 @@ namespace WebSocketServer
                 _buildingMessage = false;
                 _server.HandleMessage(App, _latestMessage);
             }
+        }
+
+        private void HandlePong()
+        {
+            Console.WriteLine($"Received `PONG` from the client at key: {Key}");
         }
     }
 }
